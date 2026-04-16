@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-models-discovery@lastest",
+    ["file:/Users/yuhp/workspace/opencode-plugin-lab", {
+      "enableConfigMutation": true,
+      "injectShellEnv": true,
+      "enableLabTool": true,
+      "enableProviderHook": true,
+      "debug": true,
+      "tag": "lab"
+    }]
+  ]
+}
