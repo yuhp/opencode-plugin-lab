@@ -4,8 +4,11 @@ import type { Logger } from "../logger"
 import type { PluginLabOptions } from "../plugin"
 
 export function createProviderHook(options: PluginLabOptions, logger: Logger): ProviderHook {
+  logger.debug("Provider hook created")
+  // the plugin will be called when the providers' id 100% match the provider id in opencode.json
+  // in this case, the provider id is "lab-provider"
   return {
-    id: "lab-provider",
+    id: "plugin-lab-mock-provider",
     models: async (provider, ctx) => {
       logger.info("Provider hook called", {
         providerID: provider.id,
@@ -17,6 +20,7 @@ export function createProviderHook(options: PluginLabOptions, logger: Logger): P
         return {} as Record<string, ProviderModel>
       }
 
+      // build a mock model
       const models: Record<string, ProviderModel> = {
         "lab-echo": {
           id: "lab-echo",
@@ -24,7 +28,7 @@ export function createProviderHook(options: PluginLabOptions, logger: Logger): P
           api: {
             id: provider.id,
             url: String(provider.options?.baseURL ?? "http://127.0.0.1:9999/v1"),
-            npm: String(provider.options?.npm ?? "@opencode-ai/plugin-lab"),
+            npm: String(provider.options?.npm ?? "@opencode-ai/sdk"),
           },
           name: `Lab Echo (${options.tag ?? "default"})`,
           capabilities: {

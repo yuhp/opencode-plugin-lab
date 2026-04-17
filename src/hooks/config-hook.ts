@@ -15,6 +15,33 @@ export function createConfigHook(
       return
     }
 
+    // inject provider, for the provider hook
+    const providers = (config.provider as Record<string, unknown> | undefined) ?? {}
+    let existMockProvider = false
+    for (const provider of Object.keys(providers)) {
+      if (provider.startsWith("plugin-lab-")) {
+        existMockProvider = true
+        logger.debug("Found plugin-lab provider", {
+          "provider id": provider,
+          "provider name": (providers[provider] as any)?.name,
+          "provider options": (providers[provider] as any)?.options,
+        })
+        continue
+      }
+      //log the provider not starting with plugin-lab-
+      logger.debug("Found provider", {
+        "provider id": provider,
+        "provider name": (providers[provider] as any)?.name,
+        "provider options": (providers[provider] as any)?.options,
+      })
+    }
+    if (!existMockProvider) {
+      providers["plugin-lab-mock-provider"] = {
+        name: "provider hook mock provider (injected by plugin-lab)",
+      }
+    }
+    config.provider = providers
+
     const commands = (config.command as Record<string, unknown> | undefined) ?? {}
     config.command = {
       ...commands,
