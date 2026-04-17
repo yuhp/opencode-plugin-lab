@@ -6,7 +6,7 @@ export function createConfigHook(
   logger: Logger
 ) {
   return async (config: Record<string, unknown>) => {
-    logger.info("Config hook called", {
+    logger.debug("Config hook called", {
       hasPluginArray: Array.isArray(config.plugin),
       hasProviderConfig: typeof config.provider === "object" && config.provider !== null,
     })
@@ -24,7 +24,7 @@ export function createConfigHook(
       },
     }
 
-    logger.info("Injected lab command into runtime config", {
+    logger.debug("Injected lab command into runtime config", {
       tag: options.tag ?? "default",
     })
   }

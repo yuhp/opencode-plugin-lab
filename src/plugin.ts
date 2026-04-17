@@ -15,6 +15,8 @@ export interface PluginLabOptions extends PluginOptions {
   injectShellEnv?: boolean
   enableLabTool?: boolean
   enableProviderHook?: boolean
+  writeLocalLog?: boolean
+  clearLocalLog?: boolean
 }
 
 export const PluginLab: Plugin = async (input, options) => {
@@ -22,6 +24,9 @@ export const PluginLab: Plugin = async (input, options) => {
   const logger = createLogger(input.client, {
     category: "plugin",
     tag: pluginOptions.tag ?? "default",
+  }, {
+    writeLocalLog: pluginOptions.writeLocalLog,
+    clearLocalLog: pluginOptions.clearLocalLog,
   })
 
   logger.info("Plugin lab initialized", {

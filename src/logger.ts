@@ -1,4 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
+import * as fs from "fs"
 
 type PluginClient = PluginInput["client"] | null | undefined
 type Level = "debug" | "info" | "warn" | "error"
@@ -11,11 +12,35 @@ export interface Logger {
   child(extra: Record<string, unknown>): Logger
 }
 
-export function createLogger(client?: PluginClient, base: Record<string, unknown> = {}): Logger {
+export interface LoggerOptions {
+  writeLocalLog?: boolean
+  clearLocalLog?: boolean
+}
+
+export function createLogger(client?: PluginClient, base: Record<string, unknown> = {}, options?: LoggerOptions): Logger {
+  if (options?.clearLocalLog) {
+    try {
+      fs.writeFileSync("plugin-lab.log", "")
+    } catch (e) {
+      // ignore fs errors
+    }
+  }
+
+  const childOptions: LoggerOptions = { writeLocalLog: options?.writeLocalLog }
+
   const log = (level: Level, message: string, extra?: Record<string, unknown>) => {
     const payload = {
       ...base,
       ...extra,
+    }
+
+    if (options?.writeLocalLog) {
+      try {
+        const logLine = `[${new Date().toISOString()}] [${level}] [opencode-plugin-lab] ${message} ${Object.keys(payload).length ? JSON.stringify(payload) : ""}\n`
+        fs.appendFileSync("plugin-lab.log", logLine)
+      } catch (e) {
+        // ignore fs errors
+      }
     }
 
     if (client?.app?.log) {
@@ -49,7 +74,7 @@ export function createLogger(client?: PluginClient, base: Record<string, unknown
       log("error", message, extra)
     },
     child(extra: Record<string, unknown>) {
-      return createLogger(client, { ...base, ...extra })
+      return createLogger(client, { ...base, ...extra }, childOptions)
     },
   }
 }
